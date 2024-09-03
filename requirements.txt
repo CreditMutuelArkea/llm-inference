@@ -1,0 +1,8 @@
+transformers
+fastapi
+uvicorn
+torch==2.0.1
+numpy
+pydantic
+prometheus-client
+httpx
