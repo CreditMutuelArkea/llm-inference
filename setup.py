@@ -23,7 +23,7 @@ setup(
     name="llm-inference",
     version=__version__,
     description="Serveur d'inférence pour les modèles Bloomz",
-    long_description=open("index.md", "r", encoding="utf-8").read(),
+    long_description=open("README.md", "r", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
     author="Killian Mahé",
     author_email="killianmahe.pro@gmail.com",
