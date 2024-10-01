@@ -28,11 +28,15 @@ def inference(request: GuardrailRequest) -> GuardrailResponse:
 
     try:
         with metrics.BATCH_INFERENCE_TIME.time():
-            outputs = ServerPipeline().pipeline(request.text, function_to_apply="sigmoid", return_all_scores=True)
+            outputs = ServerPipeline().pipeline(
+                request.text, function_to_apply="sigmoid", return_all_scores=True
+            )
     except Exception as e:
         metrics.REQUEST_FAILURE.inc()
         raise e
     else:
         metrics.REQUEST_SUCCESS.inc()
 
-    return GuardrailResponse(response=[[ClassificationItem(**cat) for cat in output] for output in outputs])
+    return GuardrailResponse(
+        response=[[ClassificationItem(**cat) for cat in output] for output in outputs]
+    )

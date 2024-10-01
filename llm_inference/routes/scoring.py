@@ -29,7 +29,10 @@ def inference(request: ScoringRequest) -> ScoringResponse:
     try:
         with metrics.BATCH_INFERENCE_TIME.time():
             outputs = ServerPipeline().pipeline(
-                [{"text": context.context, "text_pair": context.query} for context in request.contexts],
+                [
+                    {"text": context.context, "text_pair": context.query}
+                    for context in request.contexts
+                ],
                 function_to_apply="softmax",
                 return_all_scores=True,
             )
@@ -39,4 +42,6 @@ def inference(request: ScoringRequest) -> ScoringResponse:
     else:
         metrics.REQUEST_SUCCESS.inc()
 
-    return ScoringResponse(response=[[ClassificationItem(**cat) for cat in output] for output in outputs])
+    return ScoringResponse(
+        response=[[ClassificationItem(**cat) for cat in output] for output in outputs]
+    )

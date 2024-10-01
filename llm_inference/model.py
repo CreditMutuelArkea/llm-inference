@@ -39,11 +39,19 @@ def load_pipeline(model: str, model_task: Task, **kwargs):
 
     if model_task == Task.EMBEDDING:
         server_pipeline.pipeline = transformers.pipeline(
-            "feature-extraction", model=model, device=device, token=os.environ["HUGGING_FACE_HUB_TOKEN"], **kwargs
+            "feature-extraction",
+            model=model,
+            device=device,
+            token=os.environ["HUGGING_FACE_HUB_TOKEN"],
+            **kwargs
         )
     elif model_task == Task.SCORING or model_task == Task.GUARDRAIL:
         server_pipeline.pipeline = transformers.pipeline(
-            "text-classification", model=model, device=device, token=os.environ["HUGGING_FACE_HUB_TOKEN"], **kwargs
+            "text-classification",
+            model=model,
+            device=device,
+            token=os.environ["HUGGING_FACE_HUB_TOKEN"],
+            **kwargs
         )
     else:
         raise NotImplementedError("This task is not actually supported")

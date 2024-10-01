@@ -16,7 +16,7 @@ WORKDIR /usr/app
 RUN pip install virtualenv && python3 -m venv /usr/app/venv
 ENV PATH="/usr/app/venv/bin:$PATH"
 
-COPY setup.py ./requirements.txt ./requirements-dev.txt ./README.md ./MANIFEST.in ./
+COPY pyproject.toml poetry.lock README.md MANIFEST.in ./
 COPY ./${PACKAGE} /usr/app/${PACKAGE}
 
 RUN pip install --upgrade pip && pip install .

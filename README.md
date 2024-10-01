@@ -11,8 +11,8 @@ This project implements an inference server for Bloomz Large Language Models (LL
 
 ### Prerequisites
 
-- Python 3.9 or higher
-- `pip` package manager
+- Python 3.10 or higher
+- `poetry` package manager
 
 ### Clone the Repository
 
@@ -24,7 +24,7 @@ cd llm-inference
 ### Install Dependencies
 
 ```bash
-pip install -r requirements.txt
+poetry install
 ```
 
 ## Usage

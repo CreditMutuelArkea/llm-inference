@@ -3,7 +3,12 @@ import pytest
 import unittest.mock as mock
 from fastapi.testclient import TestClient
 
-from llm_inference.routes.models import EmbeddingRequest, ScoringRequest, ScoringItem, GuardrailRequest
+from llm_inference.routes.models import (
+    EmbeddingRequest,
+    ScoringRequest,
+    ScoringItem,
+    GuardrailRequest,
+)
 
 from llm_inference.__main__ import app
 from llm_inference.routes import embedding, scoring, guardrail
@@ -26,7 +31,10 @@ def test_ping_should_succeed(client):
     assert response.status_code == 200
 
 
-@pytest.mark.parametrize("pooling,expected_status_code", [("mean", 200), ("last", 200), ("not_a_valid_pooling_value", 400)])
+@pytest.mark.parametrize(
+    "pooling,expected_status_code",
+    [("mean", 200), ("last", 200), ("not_a_valid_pooling_value", 400)],
+)
 @mock.patch("llm_inference.routes.embedding.ServerPipeline")
 def test_embedding_should_succeed(pipeline, client, pooling, expected_status_code):
     # Given
@@ -52,12 +60,11 @@ def test_scoring_should_succeed(pipeline, client):
     # Given
 
     pipeline.return_value.pipeline.return_value = [
-        [
-            {"label": "POSITIVE",
-             "score": 0.6970456838607788}
-        ]
+        [{"label": "POSITIVE", "score": 0.6970456838607788}]
     ]
-    scoring_request = ScoringRequest(contexts=[ScoringItem(query="", context="Lorem ipsum")])
+    scoring_request = ScoringRequest(
+        contexts=[ScoringItem(query="", context="Lorem ipsum")]
+    )
     # When
     response = client.post("/score", json=scoring_request.model_dump())
     # Then
@@ -69,10 +76,7 @@ def test_guardrail_should_succeed(pipeline, client):
     # Given
 
     pipeline.return_value.pipeline.return_value = [
-        [
-            {"label": "POSITIVE",
-             "score": 0.6970456838607788}
-        ]
+        [{"label": "POSITIVE", "score": 0.6970456838607788}]
     ]
     embedding_request = GuardrailRequest(text=["one", "two", "three"])
     # When
