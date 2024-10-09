@@ -34,7 +34,7 @@ def inference(request: ScoringRequest) -> ScoringResponse:
                     for context in request.contexts
                 ],
                 function_to_apply="softmax",
-                return_all_scores=True,
+                top_k=None,
             )
     except Exception as e:
         metrics.REQUEST_FAILURE.inc()

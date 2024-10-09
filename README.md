@@ -43,6 +43,11 @@ HUGGING_FACE_HUB_TOKEN="<YOUR HF HUB TOKEN>"
 python -m llm_inference --model "cmarkea/bloomz-3b-retriever-v2" --task EMBEDDING
 ```
 
+The server is designed to run one task at a time. There are three different tasks:
+- EMBEDDING
+- SCORING
+- GUARDRAIL
+
 ### API Endpoints
 
 You can access server documentation through this endpoint : `/docs`
