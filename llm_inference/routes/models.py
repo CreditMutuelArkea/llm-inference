@@ -1,4 +1,5 @@
 import logging
+from enum import Enum
 from typing import List
 
 from pydantic import BaseModel
@@ -21,9 +22,14 @@ class ScoringRequest(BaseModel):
     contexts: List[ScoringItem]
 
 
+class EmbeddingPooling(str, Enum):
+    MEAN = "mean"
+    LAST = "last"
+
+
 class EmbeddingRequest(BaseModel):
     text: List[str]
-    pooling: str
+    pooling: EmbeddingPooling
 
 
 class GuardrailRequest(BaseModel):
