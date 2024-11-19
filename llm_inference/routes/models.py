@@ -1,16 +1,15 @@
 import logging
 from typing import List
 
-from pydantic import BaseModel, StringConstraints
-from typing import Annotated
+from pydantic import BaseModel
 
 
 logger = logging.getLogger(__name__)
 
 
 class ScoringItem(BaseModel):
-    query: Annotated[str, StringConstraints(max_length=3000)]
-    context: Annotated[str, StringConstraints(max_length=3000)]
+    query: str
+    context: str
 
 class ClassificationItem(BaseModel):
     label: str

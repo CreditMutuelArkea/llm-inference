@@ -83,41 +83,4 @@ def test_guardrail_should_succeed(pipeline, client):
     response = client.post("/guardrail", json=embedding_request.model_dump())
     # Then
     assert response.status_code == 200
-    
-
-def test_scoring_unprocessable_entity_error(client):
-    def generate_random_sentence(length):
-        words = [
-            "lorem", "ipsum", "dolor", "sit", "amet", "consectetur", "adipiscing", "elit", "sed", 
-            "do", "eiusmod", "tempor", "incididunt", "ut", "labore", "et", "dolore", "magna", 
-            "aliqua", "ut", "enim", "ad", "minim", "veniam", "quis", "nostrud", "exercitation", 
-            "ullamco", "laboris", "nisi", "ut", "aliquip", "ex", "ea", "commodo", "consequat",
-            "duis", "aute", "irure", "dolor", "in", "reprehenderit", "in", "voluptate", "velit",
-            "esse", "cillum", "dolore", "eu", "fugiat", "nulla", "pariatur", "excepteur", "sint",
-            "occaecat", "cupidatat", "non", "proident", "sunt", "in", "culpa", "qui", "officia",
-            "deserunt", "mollit", "anim", "id", "est", "laborum",
-        ]
-        
-        sentence = []
-        current_length = 0
-        
-        while current_length < length:
-            word = random.choice(words) 
-            sentence.append(word)
-            current_length += len(word) + 1 # longueur du mot et l'espace suivant
-
-        return ' '.join(sentence).strip()
-
-    random_sentence = generate_random_sentence(length=3001)
-    data_with_invalid_context = {
-        "contexts": [{"query": "", "context": f"{random_sentence}"}]
-    }
-    response = client.post("/score", json=data_with_invalid_context)
-    assert response.status_code == 422 
-
-    data_with_invalid_query = {
-        "contexts": [{"query": f"{random_sentence}", "context": ""}]
-    }
-    response = client.post("/score", json=data_with_invalid_query)
-    assert response.status_code == 422 
 
