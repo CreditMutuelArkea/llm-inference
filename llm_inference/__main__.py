@@ -15,7 +15,6 @@ app.include_router(healthcheck.router)
 metrics_app = make_asgi_app()
 app.mount("/metrics", metrics_app)
 
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--host", type=str, default="0.0.0.0")

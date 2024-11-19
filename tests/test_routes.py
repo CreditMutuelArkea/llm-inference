@@ -1,4 +1,5 @@
 import pytest
+import random
 
 import unittest.mock as mock
 from fastapi.testclient import TestClient
@@ -19,8 +20,7 @@ def client():
     app.include_router(embedding.router)
     app.include_router(scoring.router)
     app.include_router(guardrail.router)
-    client = TestClient(app)
-    return client
+    return TestClient(app)
 
 
 def test_ping_should_succeed(client):
@@ -83,3 +83,4 @@ def test_guardrail_should_succeed(pipeline, client):
     response = client.post("/guardrail", json=embedding_request.model_dump())
     # Then
     assert response.status_code == 200
+

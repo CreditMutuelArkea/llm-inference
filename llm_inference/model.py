@@ -45,7 +45,7 @@ def load_pipeline(model: str, model_task: Task, **kwargs):
             token=os.environ["HUGGING_FACE_HUB_TOKEN"],
             **kwargs
         )
-    elif model_task == Task.SCORING or model_task == Task.GUARDRAIL:
+    elif model_task in [Task.SCORING, Task.GUARDRAIL]:
         server_pipeline.pipeline = transformers.pipeline(
             "text-classification",
             model=model,

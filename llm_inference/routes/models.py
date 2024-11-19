@@ -12,7 +12,6 @@ class ScoringItem(BaseModel):
     query: str
     context: str
 
-
 class ClassificationItem(BaseModel):
     label: str
     score: float
