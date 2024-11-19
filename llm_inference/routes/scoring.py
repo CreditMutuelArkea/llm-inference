@@ -1,7 +1,7 @@
 import time
 import logging
 
-from fastapi import APIRouter, status
+from fastapi import APIRouter, HTTPException, status
 
 from llm_inference import metrics
 from llm_inference.routes.models import (
@@ -36,9 +36,13 @@ def inference(request: ScoringRequest) -> ScoringResponse:
                 function_to_apply="softmax",
                 top_k=None,
             )
+            
     except Exception as e:
+        # Log des erreurs spécifiques à l'application
+        logger.error(f"HTTPException: {e.detail}")
         metrics.REQUEST_FAILURE.inc()
-        raise e
+        raise HTTPException(status_code=500, detail=f"Unexpected error occurred: {e.detail}")
+        
     else:
         metrics.REQUEST_SUCCESS.inc()
 

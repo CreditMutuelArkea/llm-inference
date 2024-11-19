@@ -11,7 +11,6 @@ class ScoringItem(BaseModel):
     query: str
     context: str
 
-
 class ClassificationItem(BaseModel):
     label: str
     score: float
@@ -19,7 +18,6 @@ class ClassificationItem(BaseModel):
 
 class ScoringRequest(BaseModel):
     contexts: List[ScoringItem]
-
 
 class EmbeddingRequest(BaseModel):
     text: List[str]
