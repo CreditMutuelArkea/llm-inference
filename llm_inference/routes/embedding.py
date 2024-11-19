@@ -1,8 +1,8 @@
-import time
+import logging
 import logging
 
 import numpy as np
-from fastapi import APIRouter, status, Response
+from fastapi import APIRouter, status, Response, HTTPException
 
 from llm_inference import metrics
 from llm_inference.model import ServerPipeline
@@ -34,9 +34,13 @@ def inference(request: EmbeddingRequest):
                 outputs[i] = outputs[i][0][-1]
             else:
                 return Response("Unsupported pooling method.", status_code=400)
+
     except Exception as e:
+        # Log des erreurs spécifiques à l'application
+        logger.error(f"HTTPException: {e.detail}")
         metrics.REQUEST_FAILURE.inc()
-        raise e
+        raise HTTPException(status_code=500, detail=f"Unexpected error occurred: {e.detail}")
+    
     else:
         metrics.REQUEST_SUCCESS.inc()
     return EmbeddingResponse(embedding=outputs)
