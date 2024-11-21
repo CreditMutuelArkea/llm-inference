@@ -104,7 +104,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## Acknowledgments
 
-- [Bloomz](https://bloomz.ai) for providing the pre-trained models.
+- [BigScience](https://bigscience.huggingface.co/) for providing the pre-trained models.
 - [Crédit Mutuel Arkéa](https://www.cm-arkea.com/) for supporting this project.
 
 ## Contact
