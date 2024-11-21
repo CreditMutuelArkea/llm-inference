@@ -6,7 +6,7 @@ from fastapi import APIRouter, status, Response, HTTPException
 
 from llm_inference import metrics
 from llm_inference.model import ServerPipeline
-from llm_inference.routes.models import EmbeddingResponse, EmbeddingRequest
+from llm_inference.routes.models import EmbeddingResponse, EmbeddingRequest, EmbeddingPooling
 
 router = APIRouter(tags=["Embedding"])
 logger = logging.getLogger(__name__)
@@ -28,9 +28,9 @@ def inference(request: EmbeddingRequest):
             outputs = ServerPipeline().pipeline(request.text)
 
         for i in range(len(outputs)):
-            if request.pooling == "mean":
+            if request.pooling == EmbeddingPooling.MEAN:
                 outputs[i] = np.mean(outputs[i][0], axis=0).tolist()
-            elif request.pooling == "last":
+            elif request.pooling == EmbeddingPooling.LAST:
                 outputs[i] = outputs[i][0][-1]
             else:
                 return Response("Unsupported pooling method.", status_code=400)
