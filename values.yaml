@@ -1,0 +1,163 @@
+name: &applicationName "bloomz-3b-retriever-v2-dev"
+model: &model "cmarkea/bloomz-3b-retriever-v2"
+cname: &cname ""
+task: &task "EMBEDDING"
+pvcName: &pvcName "bloomz-3b-retriever-v2-dev"
+
+
+
+# -- Nom de votre application
+applicationName: *applicationName
+# -- Contexte de votre application (si / laisser vide)
+context: ""
+# healthcheck url /tech/instancestatus par défaut
+healthcheckUrl : "/ping"
+# Activation de la collecte des metriques
+monitoring: true
+# -- Code Boite de votre application
+codeBoite: "x260"
+# -- Code Efs de votre application
+codeEfs: 99
+redis:
+  # -- Permet d'activer un service Redis associé à votre déploiement
+  enabled: false
+env:
+  - name: HUGGING_FACE_HUB_TOKEN
+    valueFrom:
+      secretKeyRef:
+        name: hugging-face-hub-token
+        key: token
+  - name:  RUST_BACKTRACE
+    value: "full"
+  - name: TRANSFORMERS_CACHE
+    value: "/usr/app/.cache"
+database:
+  name:
+metrics:
+  # -- Permet d'exposer ces métriques au format Prometheus
+  enabled: true
+  # -- URL relative au contexte pour exposer ses metriques prometheus
+  endpoint: metrics/
+  #  -- Refresh pour scrapper les metriques
+  refresh: "15s"
+# -- Votre environnement Spring
+springProfile: &env "REC-GCP"
+image:
+  # -- Nom de votre image docker
+  repository: docker-registry.s.arkea.com/creditmutuelarkea/llm-inference
+  args: [ "--model", *model, "--port", "8080", "--task", *task]
+  pullPolicy: IfNotPresent
+  # -- Déploie les différentes versions. les dots `.` dans les tags seront remplacés par des dashes `-` dans les labels et noms d'objets. Le tag latest à est proscrire https://kubernetes.io/docs/concepts/containers/images/
+  tags: ["pr-5"]
+containerPort: 8080
+config:
+  loadConfigFromFile: true
+istio:
+  ingress:
+    # -- Protocole
+    proto: https
+    # -- Nom du host de votre application http://host.domain Votre Nom de domain est issu du cluster
+    host: *applicationName
+    # -- Nom du domain de votre application http://host.domain Le nom de domaine sera set par les appsets argocd en parametre
+    domain: l00001208-e99-354.rec.cl1.arkea.com
+    # -- cname : url d'exposition exposé aux utilisateurs monapp-val .s.arkea.com
+    cname: *cname
+  # -- Mode possible de déploiement (ingress ou virtualservice)
+  mode: virtualservice
+  # --- Mode d'exposition de votre application (private ou none (public a venir))
+  exposed: private
+  # -- requestRouting takes precedence over trafficShifting. If both are disabled, then all requests go to first tag
+  requestRouting:
+    enabled: false
+  trafficShifting:
+    enabled: false
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+serviceAccount:
+  # -- Specifies whether a service account should be created
+  create: true
+  # -- Annotations to add to the service account
+  annotations: {
+    iam.gke.io/gcp-service-account: inference@l00001208-e99-rec-709.iam.gserviceaccount.com
+  }
+  # -- The name of the service account to use.
+  # -- If not set and create is true, a name is generated using the
+  # -- fullname template
+  name: "inference"
+podAnnotations: {}
+podSecurityContext:
+  runAsNonRoot: false
+  # secompProfile:
+  # seLinuxOptions:
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: false
+service:
+  type: ClusterIP
+  port: 8000
+autoscaling:
+  enabled: true
+  # -- Minimum de Réplicas
+  minReplicaCount: 0
+  # -- Maximum de Réplicas
+  maxReplicaCount: 2
+  triggers:
+  - type: memory
+    metricType: Utilization
+    metadata:
+      value: "90"
+    #scale-to-0 en dehors de certains horaires
+  - type: cron
+    metadata:
+      timezone: Europe/Paris
+      start: 0 8 * * 1-5
+      end: 0 19 * * 1-5
+      desiredReplicas: "1" #entre start et end, j'aurais desiredReplicas, sinon ça sera minReplicaCount
+nodeSelector:
+  arkea.com/node-type: null
+  cloud.google.com/gke-accelerator: nvidia-l4
+  node_pool: apps-on-demand-l4-time-sharing-nvidia-l4
+tolerations:
+  - key: nvidia.com/gpu
+    operator: Equal
+    value: present
+    effect: NoSchedule
+  - key: arkea.com/usage
+    operator: Equal
+    value: apps-on-demand-l4-time-sharing
+    effect: NoSchedule
+affinity: {}
+resources:
+  requestsMemory: 12Gi
+  limitsMemory: 12Gi
+  limitsGpu: 1
+pvc:
+  enabled: true
+  name: *pvcName
+  finalizers:
+  - kubernetes.io/pvc-protection
+  accessModes:
+  - ReadWriteOnce
+  storageSize: 32Gi
+  storageClassName: standard-rwo-cmek
+  mountPath:
+    - "/data"
+    - "/tmp"
+gcs:
+  enabled: false
+  buckets:
+  - volumeName: gcs-fuse-csi-ephemeral-embeddings
+    bucketName: storage-models-x253-e99-rec-182
+    mountPath: /models
+    readOnly: true
+serviceEntries:
+  - hosts:
+    - "huggingface.co"
+    - "cdn-lfs.huggingface.co"
+    - "cdn-lfs-us-1.huggingface.co"
+    - "hf.co"
+    - "cdn-lfs.hf.co"
+    - "cdn-lfs-us-1.hf.co"
+    protocol: HTTPS
+    port: 443
