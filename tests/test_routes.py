@@ -1,11 +1,9 @@
 import pytest
-import random
 
 import unittest.mock as mock
 from fastapi.testclient import TestClient
 
 from llm_inference.routes.models import (
-    EmbeddingRequest,
     ScoringRequest,
     ScoringItem,
     GuardrailRequest,
