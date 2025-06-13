@@ -48,11 +48,7 @@ def test_embedding_should_succeed(pipeline, client, pooling, expected_status_cod
             ]
         ]
     ]
-    # embedding_request = EmbeddingRequest(text=["one", "two", "three"], pooling=pooling)
-    # # When
-    # response = client.post("/embed", json=embedding_request.model_dump())
-    # # Then
-    # assert response.status_code == expected_status_code
+
     payload = {"text": ["one", "two", "three"], "pooling": pooling}
 
     # When
