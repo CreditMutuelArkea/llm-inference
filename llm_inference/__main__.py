@@ -22,6 +22,8 @@ if __name__ == "__main__":
     parser.add_argument("--model", type=str, default="cmarkea/bloomz-560m-retriever")
     parser.add_argument("--task", type=str, default="EMBEDDING")
     parser.add_argument("--dtype", type=str, default="auto")
+    parser.add_argument("--mem-fraction", type=float, default="0.5")
+    parser.add_argument("--workers", type=int, default=1)
     args = parser.parse_args()
 
     model_task = Task(args.task)
@@ -33,6 +35,6 @@ if __name__ == "__main__":
     elif model_task == Task.GUARDRAIL:
         app.include_router(guardrail.router)
 
-    load_pipeline(model=args.model, model_task=model_task, torch_dtype=args.dtype)
+    load_pipeline(model=args.model, model_task=model_task, memory_fraction=args.mem_fraction, torch_dtype=args.dtype)
 
-    uvicorn.run(app, host=args.host, port=args.port)
+    uvicorn.run("llm_inference.__main__:app", host=args.host, port=args.port, workers=args.workers)
