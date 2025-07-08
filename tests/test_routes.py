@@ -1,11 +1,9 @@
 import pytest
-import random
 
 import unittest.mock as mock
 from fastapi.testclient import TestClient
 
 from llm_inference.routes.models import (
-    EmbeddingRequest,
     ScoringRequest,
     ScoringItem,
     GuardrailRequest,
@@ -33,7 +31,7 @@ def test_ping_should_succeed(client):
 
 @pytest.mark.parametrize(
     "pooling,expected_status_code",
-    [("mean", 200), ("last", 200), ("not_a_valid_pooling_value", 400)],
+    [("mean", 200), ("last", 200), ("not_a_valid_pooling_value", 422)],
 )
 @mock.patch("llm_inference.routes.embedding.ServerPipeline")
 def test_embedding_should_succeed(pipeline, client, pooling, expected_status_code):
@@ -48,9 +46,12 @@ def test_embedding_should_succeed(pipeline, client, pooling, expected_status_cod
             ]
         ]
     ]
-    embedding_request = EmbeddingRequest(text=["one", "two", "three"], pooling=pooling)
+
+    payload = {"text": ["one", "two", "three"], "pooling": pooling}
+
     # When
-    response = client.post("/embed", json=embedding_request.model_dump())
+    response = client.post("/embed", json=payload)
+
     # Then
     assert response.status_code == expected_status_code
 
