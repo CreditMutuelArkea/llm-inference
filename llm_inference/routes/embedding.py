@@ -2,6 +2,7 @@ import logging
 import logging
 
 import numpy as np
+import torch
 from fastapi import APIRouter, status, Response, HTTPException
 
 from llm_inference import metrics
@@ -31,7 +32,7 @@ def inference(request: EmbeddingRequest):
             if request.pooling == EmbeddingPooling.MEAN:
                 outputs[i] = np.mean(outputs[i][0], axis=0).tolist()
             elif request.pooling == EmbeddingPooling.LAST:
-                outputs[i] = outputs[i][0][-1]
+                outputs[i] = outputs[i][0][-1].tolist()
             else:
                 return Response("Unsupported pooling method.", status_code=400)
 
@@ -42,7 +43,10 @@ def inference(request: EmbeddingRequest):
         logger.error(f"Unexpected error: {e}")
         metrics.REQUEST_FAILURE.inc()
         raise HTTPException(status_code=500, detail=f"Unexpected error occurred: {e}")
-    
+
     else:
         metrics.REQUEST_SUCCESS.inc()
+    finally:
+        torch.cuda.empty_cache()
+
     return EmbeddingResponse(embedding=outputs)
