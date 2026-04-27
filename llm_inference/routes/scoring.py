@@ -1,6 +1,7 @@
 import time
 import logging
 
+import torch
 from fastapi import APIRouter, HTTPException, status
 
 from llm_inference import metrics
@@ -37,14 +38,18 @@ def inference(request: ScoringRequest) -> ScoringResponse:
                 top_k=None,
             )
             
-    except Exception as e:
-        # Log des erreurs spécifiques à l'application
-        logger.error(f"HTTPException: {e.detail}")
+    except HTTPException:
         metrics.REQUEST_FAILURE.inc()
-        raise HTTPException(status_code=500, detail=f"Unexpected error occurred: {e.detail}")
-        
+        raise
+    except Exception as e:
+        logger.error(f"Unexpected error: {e}")
+        metrics.REQUEST_FAILURE.inc()
+        raise HTTPException(status_code=500, detail=f"Unexpected error occurred: {e}")
+
     else:
         metrics.REQUEST_SUCCESS.inc()
+    finally:
+        torch.cuda.empty_cache()
 
     return ScoringResponse(
         response=[[ClassificationItem(**cat) for cat in output] for output in outputs]
