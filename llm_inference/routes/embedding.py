@@ -35,11 +35,13 @@ def inference(request: EmbeddingRequest):
             else:
                 return Response("Unsupported pooling method.", status_code=400)
 
-    except Exception as e:
-        # Log des erreurs spécifiques à l'application
-        logger.error(f"HTTPException: {e.detail}")
+    except HTTPException:
         metrics.REQUEST_FAILURE.inc()
-        raise HTTPException(status_code=500, detail=f"Unexpected error occurred: {e.detail}")
+        raise
+    except Exception as e:
+        logger.error(f"Unexpected error: {e}")
+        metrics.REQUEST_FAILURE.inc()
+        raise HTTPException(status_code=500, detail=f"Unexpected error occurred: {e}")
     
     else:
         metrics.REQUEST_SUCCESS.inc()
