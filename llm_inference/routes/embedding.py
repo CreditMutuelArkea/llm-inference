@@ -32,7 +32,7 @@ def inference(request: EmbeddingRequest):
             if request.pooling == EmbeddingPooling.MEAN:
                 outputs[i] = np.mean(outputs[i][0], axis=0).tolist()
             elif request.pooling == EmbeddingPooling.LAST:
-                outputs[i] = outputs[i][0][-1].tolist()
+                outputs[i] = np.array(outputs[i][0][-1]).tolist()
             else:
                 return Response("Unsupported pooling method.", status_code=400)
 
