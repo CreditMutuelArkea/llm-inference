@@ -23,6 +23,12 @@ COPY ./${PACKAGE} /usr/app/${PACKAGE}
 
 RUN pip install --upgrade pip setuptools wheel && pip install .
 
+RUN pip uninstall -y pip && \
+    apt-get update && \
+    apt-get upgrade -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
 ENV DKR_USER "python"
 ENV GUNICORN_LISTEN_ADDRESS="0.0.0.0"
 ENV GUNICORN_LISTEN_PORT=8080
