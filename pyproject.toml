@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "llm-inference"
-version = "1.2.3"
+version = "1.2.4"
 description = "An inference server for Bloomz Large Language Models (LLMs)"
 authors = ["Killian Mahé <killianmahe.pro@gmail.com>"]
 license = "Apache-2.0"
