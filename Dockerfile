@@ -42,6 +42,7 @@ RUN chown -R "$DKR_USER":"$DKR_USER" /usr/app
 
 USER $DKR_USER
 ENV PATH="/usr/app/venv/bin:$PATH"
+ENV HOME="/usr/app"
 EXPOSE ${GUNICORN_LISTEN_PORT}
 
 ENTRYPOINT ["/usr/app/venv/bin/python", "-m", "llm_inference"]
